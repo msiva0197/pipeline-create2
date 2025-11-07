@@ -1,1 +1,28 @@
 # pipeline-create2
+
+trigger: 
+- master
+pool: 
+vmImage: ubuntu-latest
+steps: 
+- task: Maven@4 
+inputs: 
+mavenPomFile: 'maven-examples/maven-example/pom.xml' 
+goals: 'clean deploy'
+publishJUnitResults: true
+testResultsFiles: '**/surefire-reports/TEST-*.xml' 
+javaHomeOption: 'JDKVersion' 
+mavenVersionOption: 'Default' 
+mavenAuthenticateFeed: true
+
+effectivePomSkip: false 
+sonarQubeRunAnalysis: false
+- task: Bash@3 
+inputs: 
+targetType: 'inline' 
+script: 'env | sort'
+- task: JFrogPublishBuildInfo@1 
+inputs: 
+artifactoryConnection: 'mk-jfrog-artifactory-hts' 
+buildName: '$(Build.DefinitionName)' 
+buildNumber: '$(Build.BuildNumber)'
